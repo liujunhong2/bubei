@@ -1,5 +1,4 @@
 package com.example.bubei;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,26 +13,25 @@ import com.example.bubei.db.WordDao;
 import com.example.bubei.model.Word;
 
 import java.util.Random;
-
 public class MainActivity extends AppCompatActivity {
     private int[] bgImages = {
             R.drawable.bg1,
             R.drawable.bg2,
             R.drawable.bg3
     };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        insertSampleWords();
+        insertSampleWords();
         initBackground();
-//        initButtons();
         initButtonsWithCounts();
     }
-
     private void insertSampleWords() {
         WordDao dao = new WordDao(this);
+        if(dao.countWordsByProficiency(0) != 0){
+            return ;
+        }
         String[][] data = {
                 {"abandon", "əˈbændən", "放弃;抛弃", "丰富的;减轻的;遗赠", "He had to abandon the car in the snow."},
                 {"benefit", "ˈbenɪfɪt", "好处;利益", "在下方;仁慈的;适合的", "He couldn't see the benefit of arguing anymore."},
@@ -93,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
             dao.insertWord(w);
         }
     }
-
     private void initBackground() {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         boolean useRandom = prefs.getBoolean("bg_random", true);
@@ -106,30 +103,15 @@ public class MainActivity extends AppCompatActivity {
         ImageView bg = findViewById(R.id.bg_image);
         bg.setImageResource(bgId);
     }
-
-    private void initButtons() {
-        findViewById(R.id.btn_learn)
-                .setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
-        findViewById(R.id.btn_review)
-                .setOnClickListener(v -> startActivity(new Intent(this, ReviewActivity.class)));
-        findViewById(R.id.btn_settings)
-                .setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
-        ((ImageButton)findViewById(R.id.btn_search))
-                .setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
-    }
     private void initButtonsWithCounts() {
         WordDao wordDao = new WordDao(this);
-
         // 获取未学习的单词数 (Learn)
         int learnCount = wordDao.countWordsByProficiency(0); // 假设 proficiency=0 表示未学
-
         // 获取需要复习的单词数 (Review)
         int reviewCount = wordDao.getWordsForReview().size();
-
         // 设置 "Learn" 按钮文字
         Button btnLearn = findViewById(R.id.btn_learn);
         btnLearn.setText(getString(R.string.learn) + " " + learnCount);
-
         // 设置 "Review" 按钮文字
         Button btnReview = findViewById(R.id.btn_review);
         btnReview.setText(getString(R.string.review) + " " + reviewCount);
