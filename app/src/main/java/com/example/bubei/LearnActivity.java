@@ -47,18 +47,26 @@ public class LearnActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         sessionLimit = prefs.getInt("session_count", 10);
 
-        // 恢复会话状态
-        if (savedInstanceState != null) {
-            sessionProgress = savedInstanceState.getInt("sessionProgress", 0);
-            currentIndex = savedInstanceState.getInt("currentIndex", 0);
-            currentProficiency = savedInstanceState.getInt("currentProficiency", 0);
-            sessionWords = savedInstanceState.getParcelableArrayList("sessionWords");
-            if (sessionWords == null) {
-                sessionWords = new ArrayList<>();
-            }
-            if (!sessionWords.isEmpty() && currentIndex < sessionWords.size()) {
+        sessionProgress = prefs.getInt("learn_session_progress", 0);
+        currentIndex = prefs.getInt("learn_current_index", 0);
+        currentProficiency = prefs.getInt("learn_current_proficiency", 0);
+
+        int currentWordId = prefs.getInt("learn_current_word_id", -1);
+        if (currentWordId != -1) {
+            currentWord = wordDao.getWordById(currentWordId);
+        }
+
+        if (sessionProgress >= sessionLimit || currentWord == null) {
+            clearSessionState();
+            loadSessionWords();
+            sessionProgress = 0;
+            currentIndex = 0;
+            if (!sessionWords.isEmpty()) {
                 currentWord = sessionWords.get(currentIndex);
-                Log.d("LearnActivity", "恢复会话: 单词=" + currentWord.getWord() + ", 熟练度=" + currentWord.getProficiency() + ", 进度=" + sessionProgress);
+            } else {
+                Toast.makeText(this, "当前暂无可学习单词，请检查词库或重新导入。", Toast.LENGTH_LONG).show();
+                finish();
+                return;
             }
         }
 
@@ -68,9 +76,8 @@ public class LearnActivity extends AppCompatActivity {
                     .setTitle(getString(R.string.exit_learning_title))
                     .setMessage(getString(R.string.exit_learning_message))
                     .setPositiveButton(getString(R.string.exit), (dialog, which) -> {
-                        // 保存状态
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
+                        saveSessionState();
+                        startActivity(new Intent(this, MainActivity.class));
                         finish();
                     })
                     .setNegativeButton(getString(R.string.cancel), null)
@@ -82,28 +89,33 @@ public class LearnActivity extends AppCompatActivity {
         bgImage.setImageResource(bgId);
 
         bindViews();
-
-        int searchId = getIntent().getIntExtra("word_id", -1);
-        if (searchId != -1) {
-            currentWord = wordDao.getWordById(searchId);
-            showWordDirectly();
-        } else if (!sessionWords.isEmpty() && currentIndex < sessionWords.size()) {
-            // 恢复会话
-            showWordDirectly();
-        } else {
-            // 开始新会话
-            loadSessionWords();
-            loadNextWord();
-        }
+        showWordDirectly();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("sessionProgress", sessionProgress);
-        outState.putInt("currentIndex", currentIndex);
-        outState.putInt("currentProficiency", currentProficiency);
-        outState.putParcelableArrayList("sessionWords", new ArrayList<>(sessionWords));
+    protected void onPause() {
+        super.onPause();
+        saveSessionState();
+    }
+
+    private void saveSessionState() {
+        SharedPreferences.Editor editor = getSharedPreferences("AppPrefs", MODE_PRIVATE).edit();
+        editor.putInt("learn_session_progress", sessionProgress);
+        editor.putInt("learn_current_index", currentIndex);
+        editor.putInt("learn_current_proficiency", currentProficiency);
+        if (currentWord != null) {
+            editor.putInt("learn_current_word_id", currentWord.getId());
+        }
+        editor.apply();
+    }
+
+    private void clearSessionState() {
+        SharedPreferences.Editor editor = getSharedPreferences("AppPrefs", MODE_PRIVATE).edit();
+        editor.remove("learn_session_progress");
+        editor.remove("learn_current_index");
+        editor.remove("learn_current_proficiency");
+        editor.remove("learn_current_word_id");
+        editor.apply();
     }
 
     private void bindViews() {
@@ -130,53 +142,35 @@ public class LearnActivity extends AppCompatActivity {
 
     private void loadSessionWords() {
         sessionWords.clear();
-        currentIndex = 0;
-        sessionProgress = 0;
-        currentProficiency = 0;
-
-        // 按熟练度迭代规则加载单词
         Set<Integer> usedWordIds = new HashSet<>();
-        for (int i = 0; i < sessionLimit; i++) {
+        int tryCount = 0;
+        int maxTry = 100;
+
+        while (sessionWords.size() < sessionLimit && tryCount < maxTry) {
             Word nextWord = getNextWordByProficiency(currentProficiency);
+            tryCount++;
+
             if (nextWord == null) {
-                nextWord = wordDao.getWordByProficiency(0, -1);
-                if (nextWord == null) break;
-                currentProficiency = 0;
+                currentProficiency = (currentProficiency + 1) % 3;
+                continue;
             }
+
             if (!usedWordIds.contains(nextWord.getId())) {
                 sessionWords.add(nextWord);
                 usedWordIds.add(nextWord.getId());
                 currentProficiency = (currentProficiency + 1) % 3;
             }
         }
-
-        if (sessionWords.isEmpty()) {
-            Toast.makeText(this, getString(R.string.no_words_available), Toast.LENGTH_LONG).show();
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        }
     }
 
-    private Word getNextWordByProficiency(int targetProficiency) {
-        int countProf1 = wordDao.countWordsByProficiency(1);
-        int countProf2 = wordDao.countWordsByProficiency(2);
-
-        if (targetProficiency == 1 && countProf1 < THRESHOLD) {
-            targetProficiency = 0;
-        } else if (targetProficiency == 2 && countProf2 < THRESHOLD) {
-            targetProficiency = 0;
-        }
-
-        Word word = wordDao.getWordByProficiency(targetProficiency, -1);
-        if (word == null && targetProficiency != 0) {
-            word = wordDao.getWordByProficiency(0, -1);
-        }
-        return word;
+    private Word getNextWordByProficiency(int level) {
+        return wordDao.getWordByProficiency(level, -1);
     }
 
     private void loadNextWord() {
         if (sessionProgress >= sessionLimit) {
             Toast.makeText(this, getString(R.string.session_complete), Toast.LENGTH_LONG).show();
+            clearSessionState();
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
@@ -188,7 +182,6 @@ public class LearnActivity extends AppCompatActivity {
         }
 
         currentWord = sessionWords.get(currentIndex);
-        Log.d("LearnActivity", "加载单词: " + currentWord.getWord() + ", 熟练度: " + currentWord.getProficiency());
         resetViews();
         showProgressInfo();
         showLevelByProficiency(currentWord.getProficiency());
@@ -198,8 +191,7 @@ public class LearnActivity extends AppCompatActivity {
         tvWord.setText(currentWord.getWord());
         tvPhonetic.setText(currentWord.getPhonetic());
         tvSentence.setText(currentWord.getSentence());
-
-        tvProgress.setText(getString(R.string.progress, sessionProgress + 1, sessionLimit));
+        tvProgress.setText(getString(R.string.progress, sessionProgress, sessionLimit));
         updateProficiencyIndicator(currentWord.getProficiency());
     }
 
@@ -215,7 +207,8 @@ public class LearnActivity extends AppCompatActivity {
         switch (level) {
             case 0: showLevel0(); break;
             case 1: showLevel1(); break;
-            case 2: showLevelFinal(); break;
+            case 2:
+            default: showLevelFinal(); break;
         }
     }
 
@@ -275,10 +268,8 @@ public class LearnActivity extends AppCompatActivity {
             }
         }
 
-        // 更新数据库和对象
         currentWord.setProficiency(level);
         wordDao.updateProficiency(currentWord.getId(), level);
-        Log.d("LearnActivity", "更新熟练度: 单词=" + currentWord.getWord() + ", 新熟练度=" + level);
 
         if (level == 3) {
             wordDao.markAsLearned(currentWord.getId());
@@ -289,6 +280,8 @@ public class LearnActivity extends AppCompatActivity {
         if (isKnown) {
             currentIndex++;
         }
+
+        saveSessionState();
 
         Intent intent = new Intent(this, WordDetailActivity.class);
         intent.putExtra("word_id", currentWord.getId());
@@ -317,6 +310,7 @@ public class LearnActivity extends AppCompatActivity {
                     .setTitle(getString(R.string.exit_learning_title))
                     .setMessage(getString(R.string.exit_learning_message))
                     .setPositiveButton(getString(R.string.exit), (dialog, which) -> {
+                        saveSessionState();
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     })

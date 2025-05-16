@@ -25,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         spBg = findViewById(R.id.sp_background);
         spCount = findViewById(R.id.sp_count);
-        spReview = findViewById(R.id.sp_review_count); // 新增绑定
+        spReview = findViewById(R.id.sp_review_count);
         btnSave = findViewById(R.id.btn_save);
         btnBack = findViewById(R.id.btn_back_settings);
 
@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> {
             saveSettings();
-            Toast.makeText(this, "设置已保存，返回主页可查看效果", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "设置已保存，返回主页可查看效果，背景设置需要重启生效", Toast.LENGTH_SHORT).show();
         });
 
         btnBack.setOnClickListener(v -> finish());
