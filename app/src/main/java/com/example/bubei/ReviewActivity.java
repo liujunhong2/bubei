@@ -24,7 +24,7 @@ public class ReviewActivity extends AppCompatActivity {
     private boolean justShowed = false;
 
     private WordDao dao;
-    private int sessionMax = 10;
+    private int sessionMax = 5; // 默认值与 SettingsActivity 默认值一致
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class ReviewActivity extends AppCompatActivity {
         dao = new WordDao(this);
 
         SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        sessionMax = prefs.getInt("session_count", 10);
+        sessionMax = prefs.getInt("review_session_limit", 5); // 使用 review_session_limit
 
         ImageView bg = findViewById(R.id.bg_image_review);
         int bgId = prefs.getInt("background_id", R.drawable.bg1);

@@ -8,10 +8,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.bubei.db.WordDao;
 import com.example.bubei.model.Word;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
@@ -46,8 +49,8 @@ public class SearchActivity extends AppCompatActivity {
 
         lvResults.setOnItemClickListener((parent, view, pos, id) -> {
             Word w = results.get(pos);
-            // 跳转到 LearnActivity，并带上 wordId
-            Intent it = new Intent(SearchActivity.this, LearnActivity.class);
+            // 跳转到 WordDetailActivity，并带上 wordId
+            Intent it = new Intent(SearchActivity.this, WordDetailActivity.class);
             it.putExtra("word_id", w.getId());
             startActivity(it);
         });
@@ -62,8 +65,13 @@ public class SearchActivity extends AppCompatActivity {
             if (results.isEmpty()) {
                 displayList.add("未找到相关单词");
             } else {
+                // 使用 LinkedHashSet 去重，保留顺序
+                LinkedHashSet<String> uniqueWords = new LinkedHashSet<>();
                 for (Word w : results) {
-                    displayList.add(w.getWord() + "  —  " + w.getDefinition());
+                    String displayText = w.getWord() + "  —  " + w.getDefinition();
+                    if (uniqueWords.add(displayText)) {
+                        displayList.add(displayText);
+                    }
                 }
             }
         } else {
@@ -71,5 +79,4 @@ public class SearchActivity extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
     }
-
 }

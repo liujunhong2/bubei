@@ -121,7 +121,7 @@ public class WordDao {
     public List<Word> getWordsForReview() {
         List<Word> rv = new ArrayList<>();
         long now = System.currentTimeMillis();
-        long[] days = {0,1,2,4,7};      // 第 1、2、4、7 天
+        long[] days = {0,1,2,4,7};
         long dayMs = 86_400_000L;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -149,6 +149,7 @@ public class WordDao {
         db.update(TABLE_NAME, v, "id=?", new String[]{String.valueOf(w.getId())});
         db.close();
     }
+
     /** 统计指定熟练度的单词个数 */
     public int countWordsByProficiency(int level) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -167,23 +168,49 @@ public class WordDao {
         db.close();
         return count;
     }
+
+    /** 获取指定熟练度的未学单词 */
+    public List<Word> getWordsByProficiency(int level) {
+        List<Word> words = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(
+                TABLE_NAME, null,
+                "proficiency = ? AND is_learned = 0",
+                new String[]{String.valueOf(level)},
+                null, null, "RANDOM()"
+        );
+        while (c.moveToNext()) {
+            words.add(extractWord(c));
+        }
+        c.close();
+        db.close();
+        return words;
+    }
+
+    /** 获取指定熟练度和排除 ID 的单词 */
     public Word getWordByProficiency(int level, int excludeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, null,
+        Cursor c = db.query(
+                TABLE_NAME, null,
                 "proficiency = ? AND is_learned = 0 AND id != ?",
                 new String[]{String.valueOf(level), String.valueOf(excludeId)},
-                null, null, "RANDOM()", "1");
+                null, null, "RANDOM()", "1"
+        );
         Word w = c.moveToFirst() ? extractWord(c) : null;
         c.close(); db.close();
         return w;
     }
+
+    /** 统计明天需要复习的单词数 */
     public int countReviewTomorrow() {
         long now = System.currentTimeMillis();
         long tomorrowMs = now + 86400000L;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, null,
-                "is_learned = 1", null, null, null, null);
+        Cursor c = db.query(
+                TABLE_NAME, null,
+                "is_learned = 1", null, null, null, null
+        );
 
         int count = 0;
         long[] days = {0,1,2,4,7};
@@ -201,5 +228,4 @@ public class WordDao {
         db.close();
         return count;
     }
-
 }

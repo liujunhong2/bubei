@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">偷背单词</string>
+    <string name="session_complete">本组学习完成！太棒了！</string>
+    <string name="no_words_available">已无待学习单词。</string>
+    <string name="exit_learning_title">退出学习</string>
+    <string name="exit_learning_message">您尚未完成当前单词的学习，确定要退出吗？</string>
+    <string name="exit">退出</string>
+    <string name="cancel">取消</string>
+    <string name="progress">学习进度：%1$d / %2$d</string>
 </resources>
