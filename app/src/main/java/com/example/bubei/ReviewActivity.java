@@ -1,5 +1,6 @@
 package com.example.bubei;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.bubei.db.WordDao;
 import com.example.bubei.model.Word;
 import java.util.List;
@@ -68,6 +70,8 @@ public class ReviewActivity extends AppCompatActivity {
             sessionProgress++;
             if (sessionProgress >= sessionMax || index >= reviewList.size()) {
                 Toast.makeText(this, "本组复习完成！", Toast.LENGTH_SHORT).show();
+                // 发送广播通知 MainActivity 更新计数
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("ACTION_UPDATE_COUNTS"));
                 finish();
             } else {
                 showCurrent();
@@ -80,6 +84,8 @@ public class ReviewActivity extends AppCompatActivity {
     private void showCurrent() {
         if (index >= reviewList.size()) {
             Toast.makeText(this, "复习完成！", Toast.LENGTH_SHORT).show();
+            // 发送广播通知 MainActivity 更新计数
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("ACTION_UPDATE_COUNTS"));
             finish();
             return;
         }
