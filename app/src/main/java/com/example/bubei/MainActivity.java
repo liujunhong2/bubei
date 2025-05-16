@@ -1,49 +1,51 @@
 package com.example.bubei;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
-    private RelativeLayout mainLayout;
     private int[] bgImages = {
             R.drawable.bg1,
             R.drawable.bg2,
             R.drawable.bg3
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainLayout = findViewById(R.id.main_layout);
+        initBackground();
+        initButtons();
+    }
 
-        int selectedBg = getRandomBackground();
-        ImageView bgImage = findViewById(R.id.bg_image);
-        bgImage.setImageResource(selectedBg);
+    private void initBackground() {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        prefs.edit().putInt("background_id", selectedBg).apply();
-        // 其他界面
-//        int bgId = getSharedPreferences("AppPrefs", MODE_PRIVATE).getInt("background_id", R.drawable.bg1);
-//        bgImage.setImageResource(bgId);
-
-        Button btnLearn = findViewById(R.id.btn_learn);
-        Button btnReview = findViewById(R.id.btn_review);
-        Button btnSettings = findViewById(R.id.btn_settings);
-        btnLearn.setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, LearnActivity.class)));
-        btnReview.setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, ReviewActivity.class)));
-        btnSettings.setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
-
-    }
-    private int getRandomBackground() {
-        Random random = new Random();
-        return bgImages[random.nextInt(bgImages.length)];
+        boolean useRandom = prefs.getBoolean("bg_random", true);
+        int bgId;
+        if (useRandom) {
+            bgId = bgImages[new Random().nextInt(bgImages.length)];
+        } else {
+            bgId = prefs.getInt("background_id", bgImages[0]);
+        }
+        ImageView bg = findViewById(R.id.bg_image);
+        bg.setImageResource(bgId);
     }
 
+    private void initButtons() {
+        findViewById(R.id.btn_learn)
+                .setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
+        findViewById(R.id.btn_review)
+                .setOnClickListener(v -> startActivity(new Intent(this, ReviewActivity.class)));
+        findViewById(R.id.btn_settings)
+                .setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        ((ImageButton)findViewById(R.id.btn_search))
+                .setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+    }
 }

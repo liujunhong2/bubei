@@ -1,23 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/learn_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/learn_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".LearnActivity">
+    android:layout_height="match_parent">
+
+    <!-- 背景图 -->
     <ImageView
-        android:id="@+id/bg_image"
+        android:id="@+id/bg_image_learn"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:adjustViewBounds="true"
-        android:src="@drawable/bg1" /> <!-- 默认占位图 -->
-    <View
-        android:id="@+id/dark_overlay"
+        android:alpha="0.3"
+        android:src="@drawable/bg1" />
+
+    <!-- 滚动学习内容 -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#66000000" />
+        android:padding="32dp"
+        android:fillViewport="true">
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- 单词 -->
+            <TextView
+                android:id="@+id/tv_word"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- 音标 -->
+            <TextView
+                android:id="@+id/tv_phonetic"
+                android:textSize="18sp"
+                android:textColor="#666666"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- 例句 -->
+            <TextView
+                android:id="@+id/tv_sentence"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- 零阶四选项 -->
+            <LinearLayout
+                android:id="@+id/level0_layout"
+                android:orientation="vertical"
+                android:layout_marginTop="32dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button android:id="@+id/btn_option1"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:backgroundTint="#EEEEEE"
+                    android:layout_marginBottom="12dp"/>
+
+                <Button android:id="@+id/btn_option2"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:backgroundTint="#EEEEEE"
+                    android:layout_marginBottom="12dp"/>
+
+                <Button android:id="@+id/btn_option3"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:backgroundTint="#EEEEEE"
+                    android:layout_marginBottom="12dp"/>
+
+                <Button android:id="@+id/btn_option4"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:backgroundTint="#EEEEEE"
+                    android:layout_marginBottom="12dp"/>
+            </LinearLayout>
+
+            <!-- 熟练度阶段按钮 -->
+            <LinearLayout
+                android:id="@+id/level_btn_group"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="36dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btn_know"
+                    android:layout_width="120dp"
+                    android:layout_height="48dp"
+                    android:text="认识"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#6200EE"
+                    android:layout_marginEnd="24dp"/>
+
+                <Button
+                    android:id="@+id/btn_dont_know"
+                    android:layout_width="120dp"
+                    android:layout_height="48dp"
+                    android:text="不认识"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#6200EE" />
+            </LinearLayout>
+
+            <!-- 提示按钮 -->
+            <Button
+                android:id="@+id/btn_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="提示一下"
+                android:layout_marginTop="24dp"
+                android:visibility="gone"
+                android:textColor="#222222"
+                android:backgroundTint="#DDDDDD"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 固定左上角返回按钮 -->
+    <ImageButton
+        android:id="@+id/btn_back_to_main"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="返回主界面"
+        android:layout_gravity="start|top"/>
+</FrameLayout>

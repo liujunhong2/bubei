@@ -4,36 +4,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 背景图全屏 -->
+    <!-- 背景图 -->
     <ImageView
         android:id="@+id/bg_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:adjustViewBounds="true"
-        android:src="@drawable/bg1" /> <!-- 默认占位图 -->
+        android:alpha="0.3"
+        android:src="@drawable/bg1" />
 
-    <!-- 半透明遮罩（提升按钮可读性） -->
-    <!-- 40%透明黑色遮罩 -->
-    <!-- 按钮层：居中区域 -->
-    <!-- 左下角设置按钮 -->
-
+    <!-- 屏幕遮罩 -->
     <View
-        android:id="@+id/dark_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#66000000" />
 
+    <!-- 左上：Search -->
+    <ImageButton
+        android:id="@+id/btn_search"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_search"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="Search" />
+
+    <!-- 左上：Settings（圆形） -->
+    <ImageButton
+        android:id="@+id/btn_settings"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="72dp"
+        android:background="@drawable/bg_circle_button"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:contentDescription="Settings" />
+
+    <!-- 底部操作按钮 -->
     <LinearLayout
         android:id="@+id/center_buttons"
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginBottom="90dp"
+        android:paddingBottom="80dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -41,36 +58,14 @@
             android:id="@+id/btn_learn"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Learn"
-            android:backgroundTint="#A8D5BA"
-            android:textColor="#004225"
-            android:textSize="18sp" />
+            android:text="Learn" />
 
         <Button
             android:id="@+id/btn_review"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:backgroundTint="#A8D5BA"
-            android:textColor="#004225"
             android:text="Review"
-            android:textSize="18sp" />
+            android:layout_marginStart="24dp"/>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="19dp"
-        android:layout_marginTop="27dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#A8D5BA"
-        android:text="Setting"
-        android:textColor="#004225"
-        android:textSize="16sp" />
 
 </RelativeLayout>
