@@ -5,14 +5,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
-    private Spinner spBg, spCount;
-    private Button btnSave, btnBack;
+    private Spinner spBg, spCount, spReview; // 添加复习 Spinner
+    private Button btnSave;
+    private ImageButton btnBack;
+
+    private final int[] bgImages = {0, R.drawable.bg1, R.drawable.bg2, R.drawable.bg3};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,13 +25,19 @@ public class SettingsActivity extends AppCompatActivity {
 
         spBg = findViewById(R.id.sp_background);
         spCount = findViewById(R.id.sp_count);
+        spReview = findViewById(R.id.sp_review_count); // 新增绑定
         btnSave = findViewById(R.id.btn_save);
         btnBack = findViewById(R.id.btn_back_settings);
 
         setupBackgroundSpinner();
         setupCountSpinner();
+        setupReviewSpinner();
 
-        btnSave.setOnClickListener(v -> saveSettings());
+        btnSave.setOnClickListener(v -> {
+            saveSettings();
+            Toast.makeText(this, "设置已保存，返回主页可查看效果", Toast.LENGTH_SHORT).show();
+        });
+
         btnBack.setOnClickListener(v -> finish());
     }
 
@@ -41,12 +51,21 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupCountSpinner() {
-        Integer[] counts = {5,10,15,20};
+        Integer[] counts = {5, 10, 15, 20};
         spCount.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, counts));
         int saved = getSharedPreferences("AppPrefs", MODE_PRIVATE)
                 .getInt("session_count", 10);
         spCount.setSelection(java.util.Arrays.asList(counts).indexOf(saved));
+    }
+
+    private void setupReviewSpinner() {
+        Integer[] reviewCounts = {3, 5, 10, 15};
+        spReview.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, reviewCounts));
+        int saved = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                .getInt("review_session_limit", 5);
+        spReview.setSelection(java.util.Arrays.asList(reviewCounts).indexOf(saved));
     }
 
     private void saveSettings() {
@@ -55,15 +74,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         int bgIdx = spBg.getSelectedItemPosition();
         e.putBoolean("bg_random", bgIdx == 0);
-        e.putInt("bg_index", bgIdx);           // 1,2,3 代表三张图
-        int[] imgs = {0, R.drawable.bg1, R.drawable.bg2, R.drawable.bg3};
-        if (bgIdx != 0) e.putInt("background_id", imgs[bgIdx]);
+        e.putInt("bg_index", bgIdx);
+        if (bgIdx != 0) {
+            e.putInt("background_id", bgImages[bgIdx]);
+        }
 
-        int cnt = (Integer)spCount.getSelectedItem();
+        int cnt = (Integer) spCount.getSelectedItem();
         e.putInt("session_count", cnt);
 
+        int reviewCnt = (Integer) spReview.getSelectedItem();
+        e.putInt("review_session_limit", reviewCnt);
+
         e.apply();
-        Toast.makeText(this, "设置已保存", Toast.LENGTH_SHORT).show();
-        finish();
     }
 }

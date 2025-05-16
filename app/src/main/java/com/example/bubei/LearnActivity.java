@@ -1,12 +1,8 @@
 package com.example.bubei;
 
-import static com.example.bubei.db.WordDBHelper.TABLE_NAME;
-
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +22,7 @@ import java.util.List;
 
 public class LearnActivity extends AppCompatActivity {
     private TextView tvWord, tvPhonetic, tvSentence;
+    private TextView tvProgress, tvProficiencyIndicator;
     private Button btnOption1, btnOption2, btnOption3, btnOption4;
     private Button btnKnow, btnDontKnow;
     private View level0Layout, btnGroup;
@@ -34,32 +31,46 @@ public class LearnActivity extends AppCompatActivity {
     private Word currentWord;
     private List<String> allOptions = new ArrayList<>();
 
+    private int sessionLimit = 10;
+    private int sessionProgress = 0;
+    private int lastWordId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn);
 
+        wordDao = new WordDao(this);
+        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+        sessionLimit = prefs.getInt("session_count", 10);
+
         ImageButton btnBack = findViewById(R.id.btn_back_to_main);
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         });
 
-
         ImageView bgImage = findViewById(R.id.bg_image_learn);
-        int bgId = getSharedPreferences("AppPrefs", MODE_PRIVATE).getInt("background_id", R.drawable.bg1);
+        int bgId = prefs.getInt("background_id", R.drawable.bg1);
         bgImage.setImageResource(bgId);
 
-        wordDao = new WordDao(this);
         bindViews();
-        loadNextWord();
+
+        int searchId = getIntent().getIntExtra("word_id", -1);
+        if (searchId != -1) {
+            currentWord = wordDao.getWordById(searchId);
+            showWordDirectly();
+        } else {
+            loadNextWord();
+        }
     }
 
     private void bindViews() {
         tvWord = findViewById(R.id.tv_word);
         tvPhonetic = findViewById(R.id.tv_phonetic);
         tvSentence = findViewById(R.id.tv_sentence);
+        tvProgress = findViewById(R.id.tv_progress);
+        tvProficiencyIndicator = findViewById(R.id.tv_proficiency_indicator);
 
         btnOption1 = findViewById(R.id.btn_option1);
         btnOption2 = findViewById(R.id.btn_option2);
@@ -74,33 +85,31 @@ public class LearnActivity extends AppCompatActivity {
 
         btnKnow.setOnClickListener(v -> updateProficiency(true));
         btnDontKnow.setOnClickListener(v -> updateProficiency(false));
+
     }
 
-    private int lastWordId = -1; // 避免同词重复
     private void loadNextWord() {
+        if (sessionProgress >= sessionLimit) {
+            Toast.makeText(this, "本组学习完成！太棒了！", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
         Word candidate = null;
-
-        // 优先从熟练度 0 的库里拿一个单词
-        // 然后如果 0→1 阶段的数量 < 阈值，则一直留在 0
-        // 再尝试 1 阶段：1→2 阶段也检查阈值
-        // 最后阶段（2 和 3）不检查阈值，直接拿
-        int threshold = 2; // 0→1 和 1→2 需要达到的最小数量
+        int threshold = 2;
         for (int level = 0; level < 3; level++) {
             if (level <= 1) {
-                // 只在级别 0 和 1 时，检查“下一阶段”数量是否已满
                 int countNext = wordDao.countWordsByProficiency(level + 1);
                 if (countNext < threshold) {
                     candidate = wordDao.getWordByProficiency(level, lastWordId);
                 }
             } else {
-                // 级别 2 和 3 时，直接拿一个
                 candidate = wordDao.getWordByProficiency(level, lastWordId);
             }
             if (candidate != null) break;
         }
-
         if (candidate == null) {
-            Toast.makeText(this, "今日学习已完成！", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "已无待学习单词。", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
@@ -109,16 +118,19 @@ public class LearnActivity extends AppCompatActivity {
         currentWord = candidate;
         lastWordId = currentWord.getId();
 
-        // 显示逻辑不变
-        int level = currentWord.getProficiency();
         resetViews();
+        showProgressInfo();
+        showLevelByProficiency(currentWord.getProficiency());
+    }
+
+
+    private void showProgressInfo() {
+        tvWord.setText(currentWord.getWord());
         tvPhonetic.setText(currentWord.getPhonetic());
         tvSentence.setText(currentWord.getSentence());
-        switch (level) {
-            case 0: showLevel0(); break;
-            case 1: showLevel1(); break;
-            default: showLevelFinal(); break;
-        }
+
+        tvProgress.setText("学习进度：" + (sessionProgress) + " / " + sessionLimit);
+        updateProficiencyIndicator(currentWord.getProficiency());
     }
 
     private void resetViews() {
@@ -129,8 +141,15 @@ public class LearnActivity extends AppCompatActivity {
         btnGroup.setVisibility(View.GONE);
     }
 
+    private void showLevelByProficiency(int level) {
+        switch (level) {
+            case 0: showLevel0(); break;
+            case 1: showLevel1(); break;
+            default: showLevelFinal(); break;
+        }
+    }
+
     private void showLevel0() {
-        tvWord.setText(currentWord.getWord());
         tvWord.setVisibility(View.VISIBLE);
         tvPhonetic.setVisibility(View.VISIBLE);
         level0Layout.setVisibility(View.VISIBLE);
@@ -146,10 +165,10 @@ public class LearnActivity extends AppCompatActivity {
             buttons[i].setText(text);
             buttons[i].setOnClickListener(v -> {
                 if (text.equals(currentWord.getDefinition())) {
-                    Toast.makeText(this, "选择正确！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "正确！", Toast.LENGTH_SHORT).show();
                     updateProficiency(true);
                 } else {
-                    Toast.makeText(this, "答错了", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "错误", Toast.LENGTH_SHORT).show();
                     updateProficiency(false);
                 }
             });
@@ -157,49 +176,57 @@ public class LearnActivity extends AppCompatActivity {
     }
 
     private void showLevel1() {
-        tvWord.setText(currentWord.getWord());
         tvWord.setVisibility(View.VISIBLE);
         tvSentence.setVisibility(View.VISIBLE);
         btnGroup.setVisibility(View.VISIBLE);
     }
 
     private void showLevelFinal() {
-        tvWord.setText(currentWord.getWord());
         tvWord.setVisibility(View.VISIBLE);
         btnGroup.setVisibility(View.VISIBLE);
     }
 
-
     private void updateProficiency(boolean isKnown) {
         int level = currentWord.getProficiency();
-        Log.d("LearnActivity", "当前单词熟练度1：" + level + "，id=" + currentWord.getId());
-        if (isKnown && level < 3) {
-            level++;
-        } else if (!isKnown && level > 0) {
-            level--;
-        }
-        Log.d("LearnActivity", "当前单词熟练度2：" + level + "，id=" + currentWord.getId());
+        if (isKnown && level < 3) level++;
+        else if (!isKnown) level = 0;
 
         currentWord.setProficiency(level);
         wordDao.updateProficiency(currentWord.getId(), level);
 
         if (level == 3) {
-            wordDao.markAsLearned(currentWord.getId());  // 进入复习队列
+            sessionProgress++;
+            wordDao.markAsLearned(currentWord.getId());
         }
+        Intent intent = new Intent(this, WordDetailActivity.class);
+        intent.putExtra("word_id", currentWord.getId());
+        startActivity(intent);
 
         loadNextWord();
     }
 
 
+    private void updateProficiencyIndicator(int level) {
+        String[] symbols = {"❌", "⭐", "⭐⭐", "⭐⭐⭐"};
+        if (level >= 0 && level <= 3) {
+            tvProficiencyIndicator.setText("记忆进度：" + symbols[level]);
+        }
+    }
 
-    // 顶部导航返回按钮
+    private void showWordDirectly() {
+        resetViews();
+        showProgressInfo();
+        showLevelByProficiency(currentWord.getProficiency());
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            startActivity(new Intent(this, MainActivity.class)); // ← 点击左上角返回主页面
+            startActivity(new Intent(this, MainActivity.class));
             finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

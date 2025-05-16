@@ -22,33 +22,45 @@
         <!-- 背景切换 -->
         <TextView
             android:text="背景选择"
-            android:textSize="18sp" android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            />
+            android:textSize="18sp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
         <Spinner
             android:id="@+id/sp_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"/>
 
-        <!-- 学习单词数 -->
+        <!-- 每次学习数量 -->
         <TextView
             android:text="每次学习数量"
             android:textSize="18sp"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            />
+            android:layout_height="wrap_content"/>
         <Spinner
             android:id="@+id/sp_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"/>
 
-        <!-- 保存 -->
+        <!-- 每次复习数量（新增） -->
+        <TextView
+            android:text="每次复习数量"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Spinner
+            android:id="@+id/sp_review_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- 保存按钮 -->
         <Button
             android:id="@+id/btn_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="保存设置"/>
     </LinearLayout>
+
 </RelativeLayout>
