@@ -7,4 +7,6 @@
     <string name="exit">退出</string>
     <string name="cancel">取消</string>
     <string name="progress">学习进度：%1$d / %2$d</string>
+    <string name="learn">Learn</string>
+    <string name="review">Review</string>
 </resources>

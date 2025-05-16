@@ -151,12 +151,13 @@ public class WordDao {
     }
 
     /** 统计指定熟练度的单词个数 */
+    /** 统计指定熟练度的未学单词个数 */
     public int countWordsByProficiency(int level) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 TABLE_NAME,
                 new String[]{"COUNT(*) AS cnt"},
-                "proficiency = ?",
+                "proficiency = ? AND is_learned = 0", // 添加 is_learned = 0 条件
                 new String[]{String.valueOf(level)},
                 null, null, null
         );

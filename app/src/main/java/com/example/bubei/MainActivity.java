@@ -3,6 +3,7 @@ package com.example.bubei;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -25,9 +26,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        insertSampleWords();
+//        insertSampleWords();
         initBackground();
-        initButtons();
+//        initButtons();
+        initButtonsWithCounts();
     }
 
     private void insertSampleWords() {
@@ -113,6 +115,32 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_settings)
                 .setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         ((ImageButton)findViewById(R.id.btn_search))
+                .setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+    }
+    private void initButtonsWithCounts() {
+        WordDao wordDao = new WordDao(this);
+
+        // 获取未学习的单词数 (Learn)
+        int learnCount = wordDao.countWordsByProficiency(0); // 假设 proficiency=0 表示未学
+
+        // 获取需要复习的单词数 (Review)
+        int reviewCount = wordDao.getWordsForReview().size();
+
+        // 设置 "Learn" 按钮文字
+        Button btnLearn = findViewById(R.id.btn_learn);
+        btnLearn.setText(getString(R.string.learn) + " " + learnCount);
+
+        // 设置 "Review" 按钮文字
+        Button btnReview = findViewById(R.id.btn_review);
+        btnReview.setText(getString(R.string.review) + " " + reviewCount);
+        btnLearn.setBackgroundColor(Color.parseColor("#A8D5BA"));
+        btnReview.setBackgroundColor(Color.parseColor("#A8D5BA"));
+        // 设置按钮点击事件
+        btnLearn.setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
+        btnReview.setOnClickListener(v -> startActivity(new Intent(this, ReviewActivity.class)));
+        findViewById(R.id.btn_settings)
+                .setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        ((ImageButton) findViewById(R.id.btn_search))
                 .setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
     }
 }
