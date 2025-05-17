@@ -1,12 +1,9 @@
 package com.example.bubei.model;
-
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 public class Word implements Parcelable {
     private int id;
     private String word;
@@ -18,10 +15,8 @@ public class Word implements Parcelable {
     private int isLearned;
     private long lastReviewTime;
     private int reviewCount;
-
     // 构造函数
     public Word() {}
-
     public Word(String word, String phonetic, String definition, String choices, String sentence, int proficiency) {
         this.word = word;
         this.phonetic = phonetic;
@@ -33,8 +28,6 @@ public class Word implements Parcelable {
         this.lastReviewTime = 0;
         this.reviewCount = 0;
     }
-
-    // Getter 和 Setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getWord() { return word; }
@@ -59,7 +52,6 @@ public class Word implements Parcelable {
     public void setLastReviewTime(long lastReviewTime) { this.lastReviewTime = lastReviewTime; }
     public int getReviewCount() { return reviewCount; }
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-
     // Parcelable 实现
     protected Word(Parcel in) {
         id = in.readInt();
@@ -73,12 +65,10 @@ public class Word implements Parcelable {
         lastReviewTime = in.readLong();
         reviewCount = in.readInt();
     }
-
     @Override
     public int describeContents() {
         return 0;
     }
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
@@ -92,13 +82,11 @@ public class Word implements Parcelable {
         dest.writeLong(lastReviewTime);
         dest.writeInt(reviewCount);
     }
-
     public static final Creator<Word> CREATOR = new Creator<Word>() {
         @Override
         public Word createFromParcel(Parcel in) {
             return new Word(in);
         }
-
         @Override
         public Word[] newArray(int size) {
             return new Word[size];

@@ -1,5 +1,4 @@
 package com.example.bubei;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,25 +14,21 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.bubei.db.WordDao;
 import com.example.bubei.model.Word;
 import java.util.Random;
-
 public class MainActivity extends AppCompatActivity {
     private int[] bgImages = {
             R.drawable.bg1,
             R.drawable.bg2,
             R.drawable.bg3
     };
-
     private Button btnLearn, btnReview; // 声明按钮为成员变量，以便在广播中访问
     private BroadcastReceiver countUpdateReceiver; // 声明广播接收器
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        insertSampleWords();
+        insertSampleWords();
         initBackground();
         initButtonsWithCounts();
-
         // 注册广播接收器
         countUpdateReceiver = new BroadcastReceiver() {
             @Override
@@ -47,16 +42,17 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter("ACTION_UPDATE_COUNTS")
         );
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // 注销广播接收器
         LocalBroadcastManager.getInstance(this).unregisterReceiver(countUpdateReceiver);
     }
-
     private void insertSampleWords() {
         WordDao dao = new WordDao(this);
+        if (dao.countWordsByProficiency(0) != 0) {
+            return ;
+        }
         String[][] data = {
                 {"abandon", "əˈbændən", "放弃;抛弃", "丰富的;减轻的;遗赠", "He had to abandon the car in the snow."},
                 {"benefit", "ˈbenɪfɪt", "好处;利益", "在下方;仁慈的;适合的", "He couldn't see the benefit of arguing anymore."},
@@ -110,13 +106,11 @@ public class MainActivity extends AppCompatActivity {
                 {"yearn", "jɜːn", "渴望;向往", "纱线;学习;赚取", "She yearned for adventure."},
                 {"zeal", "ziːl", "热情;热忱", "密封;交易;感觉", "He worked with great zeal."}
         };
-
         for (String[] row : data) {
             Word w = new Word(row[0], row[1], row[2], row[3], row[4], 0);
             dao.insertWord(w);
         }
     }
-
     private void initBackground() {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         boolean useRandom = prefs.getBoolean("bg_random", true);
@@ -129,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
         ImageView bg = findViewById(R.id.bg_image);
         bg.setImageResource(bgId);
     }
-
     private void initButtonsWithCounts() {
         WordDao wordDao = new WordDao(this);
         // 获取未学习的单词数 (Learn)
