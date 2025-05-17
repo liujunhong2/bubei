@@ -125,19 +125,16 @@ public class MainActivity extends AppCompatActivity {
     }
     private void initButtonsWithCounts() {
         WordDao wordDao = new WordDao(this);
-        // 获取未学习的单词数 (Learn)
-        int learnCount = wordDao.countWordsByProficiency(0); // 假设 proficiency=0 表示未学
-        // 获取需要复习的单词数 (Review)
+        int learnCount = wordDao.countWordsByProficiency(0);
+        learnCount += wordDao.countWordsByProficiency(1);
+        learnCount += wordDao.countWordsByProficiency(2);
         int reviewCount = wordDao.getWordsForReview().size();
-        // 设置 "Learn" 按钮文字
         btnLearn = findViewById(R.id.btn_learn);
         btnLearn.setText(getString(R.string.learn) + " " + learnCount);
-        // 设置 "Review" 按钮文字
         btnReview = findViewById(R.id.btn_review);
         btnReview.setText(getString(R.string.review) + " " + reviewCount);
         btnLearn.setBackgroundColor(Color.parseColor("#A8D5BA"));
         btnReview.setBackgroundColor(Color.parseColor("#A8D5BA"));
-        // 设置按钮点击事件
         btnLearn.setOnClickListener(v -> startActivity(new Intent(this, LearnActivity.class)));
         btnReview.setOnClickListener(v -> startActivity(new Intent(this, ReviewActivity.class)));
         findViewById(R.id.btn_settings)

@@ -222,9 +222,9 @@ public class LearnActivity extends AppCompatActivity {
     }
     private void updateProficiency(boolean isKnown) {
         int level = currentWord.getProficiency();
-        if (isKnown && level < 3) {
+        if (isKnown) {
             level++;
-        } else if (!isKnown) {
+        } else{
             level = 0;
             sessionWords.remove(currentIndex);
             Word newWord = wordDao.getWordByProficiency(0, currentWord.getId());
