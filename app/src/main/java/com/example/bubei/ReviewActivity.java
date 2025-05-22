@@ -22,7 +22,7 @@ public class ReviewActivity extends AppCompatActivity {
     private int sessionProgress = 0;
     private boolean justShowed = false;
     private WordDao dao;
-    private int sessionMax = 5; // 默认值与 SettingsActivity 默认值一致
+    private int sessionMax = 5;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
