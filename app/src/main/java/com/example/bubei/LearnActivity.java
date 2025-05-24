@@ -202,10 +202,10 @@ public class LearnActivity extends AppCompatActivity {
             buttons[i].setText(text);
             buttons[i].setOnClickListener(v -> {
                 if (text.equals(currentWord.getDefinition())) {
-                    Toast.makeText(this, "正确！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "\uD83D\uDCAF", Toast.LENGTH_SHORT).show();
                     updateProficiency(true);
                 } else {
-                    Toast.makeText(this, "错误", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "\uD83E\uDD23", Toast.LENGTH_SHORT).show();
                     updateProficiency(false);
                 }
             });
