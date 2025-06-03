@@ -15,7 +15,6 @@ public class Word implements Parcelable {
     private int isLearned;
     private long lastReviewTime;
     private int reviewCount;
-    // 构造函数
     public Word() {}
     public Word(String word, String phonetic, String definition, String choices, String sentence, int proficiency) {
         this.word = word;
@@ -52,7 +51,6 @@ public class Word implements Parcelable {
     public void setLastReviewTime(long lastReviewTime) { this.lastReviewTime = lastReviewTime; }
     public int getReviewCount() { return reviewCount; }
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-    // Parcelable 实现
     protected Word(Parcel in) {
         id = in.readInt();
         word = in.readString();

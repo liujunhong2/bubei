@@ -12,7 +12,6 @@ public class WordDao {
     public WordDao(Context context) {
         dbHelper = new WordDBHelper(context);
     }
-    /** 通用：从 Cursor 构造 Word 对象 */
     private Word extractWord(Cursor c) {
         Word w = new Word();
         w.setId(c.getInt(c.getColumnIndexOrThrow("id")));
@@ -27,7 +26,6 @@ public class WordDao {
         w.setReviewCount(c.getInt(c.getColumnIndexOrThrow("review_count")));
         return w;
     }
-    /** 0. 插入新词 */
     public void insertWord(Word word) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -43,7 +41,6 @@ public class WordDao {
         db.insert(TABLE_NAME, null, v);
         db.close();
     }
-    /** 1. 按熟练度查询下一个待学单词（初学阶段 is_learned=0） */
     public Word getNextWord() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -56,7 +53,6 @@ public class WordDao {
         c.close(); db.close();
         return w;
     }
-    /** 2. 更新熟练度 */
     public void updateProficiency(int id, int newLevel) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -64,7 +60,6 @@ public class WordDao {
         db.update(TABLE_NAME, v, "id=?", new String[]{String.valueOf(id)});
         db.close();
     }
-    /** 3. 标记为已学，进入复习队列 */
     public void markAsLearned(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -74,7 +69,6 @@ public class WordDao {
         db.update(TABLE_NAME, v, "id=?", new String[]{String.valueOf(id)});
         db.close();
     }
-    /** 4. 模糊搜索：word LIKE %keyword% */
     public List<Word> searchWords(String keyword) {
         List<Word> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -91,7 +85,6 @@ public class WordDao {
         c.close(); db.close();
         return list;
     }
-    /** 5. 根据 ID 查单词 */
     public Word getWordById(int id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -103,7 +96,6 @@ public class WordDao {
         c.close(); db.close();
         return w;
     }
-    /** 6. 获取需要复习的单词：is_learned=1 且符合艾宾浩斯时间 */
     public List<Word> getWordsForReview() {
         List<Word> rv = new ArrayList<>();
         long now = System.currentTimeMillis();
@@ -125,7 +117,6 @@ public class WordDao {
         c.close(); db.close();
         return rv;
     }
-    /** 7. 更新复习状态 */
     public void updateReviewState(Word w) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues v = new ContentValues();
@@ -134,14 +125,12 @@ public class WordDao {
         db.update(TABLE_NAME, v, "id=?", new String[]{String.valueOf(w.getId())});
         db.close();
     }
-    /** 统计指定熟练度的单词个数 */
-    /** 统计指定熟练度的未学单词个数 */
     public int countWordsByProficiency(int level) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 TABLE_NAME,
                 new String[]{"COUNT(*) AS cnt"},
-                "proficiency = ? AND is_learned = 0", // 添加 is_learned = 0 条件
+                "proficiency = ? AND is_learned = 0",
                 new String[]{String.valueOf(level)},
                 null, null, null
         );
@@ -153,7 +142,6 @@ public class WordDao {
         db.close();
         return count;
     }
-    /** 获取指定熟练度的未学单词 */
     public List<Word> getWordsByProficiency(int level) {
         List<Word> words = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -170,7 +158,6 @@ public class WordDao {
         db.close();
         return words;
     }
-    /** 获取指定熟练度和排除 ID 的单词 */
     public Word getWordByProficiency(int level, int excludeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(
@@ -183,7 +170,6 @@ public class WordDao {
         c.close(); db.close();
         return w;
     }
-    /** 统计明天需要复习的单词数 */
     public int countReviewTomorrow() {
         long now = System.currentTimeMillis();
         long tomorrowMs = now + 86400000L;

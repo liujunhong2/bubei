@@ -49,7 +49,6 @@ public class SearchActivity extends AppCompatActivity {
 
         lvResults.setOnItemClickListener((parent, view, pos, id) -> {
             Word w = results.get(pos);
-            // 跳转到 WordDetailActivity，并带上 wordId
             Intent it = new Intent(SearchActivity.this, WordDetailActivity.class);
             it.putExtra("word_id", w.getId());
             startActivity(it);

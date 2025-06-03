@@ -249,7 +249,7 @@ public class LearnActivity extends AppCompatActivity {
         loadNextWord();
     }
     private void updateProficiencyIndicator(int level) {
-        String[] symbols = {"❌", "⭐", "⭐⭐", "⭐⭐⭐"};
+        String[] symbols = {"0", "⭐", "⭐⭐", "⭐⭐⭐"};
         if (level >= 0 && level <= 3) {
             tvProficiencyIndicator.setText("记忆进度：" + symbols[level]);
         }

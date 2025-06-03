@@ -9,7 +9,6 @@ public class WordDBHelper extends SQLiteOpenHelper {
     public WordDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
-    // 创建表时一次性声明所有字段
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
