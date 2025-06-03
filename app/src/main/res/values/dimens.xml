@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 常见手机状态栏高度大约是 24dp，这里可根据测试机型调整 -->
+    <dimen name="status_bar_height">24dp</dimen>
+    <!-- “状态栏高度 + 外边距 16dp”，总计 40dp -->
+    <dimen name="status_bar_and_margin">40dp</dimen>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图 -->
+    <ImageView
+        android:id="@+id/bg_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.3"
+        android:src="@drawable/bg1" />
+
+    <!-- 屏幕遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000" />
+
+    <!-- 左上：Search -->
+    <ImageButton
+        android:id="@+id/btn_search"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_circle_button"
+        android:contentDescription="Search"
+        android:src="@android:drawable/ic_menu_search" />
+
+    <!-- 左上：Settings（圆形） -->
+    <ImageButton
+        android:id="@+id/btn_settings"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="72dp"
+        android:background="@drawable/bg_circle_button"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:contentDescription="Settings" />
+
+    <!-- 底部操作按钮 -->
+    <LinearLayout
+        android:id="@+id/center_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="80dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_learn"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Learn" />
+
+        <Button
+            android:id="@+id/btn_review"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Review"
+            android:layout_marginStart="24dp"/>
+    </LinearLayout>
+
+</RelativeLayout>

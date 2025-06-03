@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- 让系统绘制状态栏背景，并将状态栏设为透明 -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 让布局延伸到状态栏之下 -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!-- 关闭 fitsSystemWindows，让布局真正铺满整个屏幕 -->
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+</resources>
