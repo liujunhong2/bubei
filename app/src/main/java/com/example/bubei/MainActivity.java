@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        insertSampleWords();
         initBackground();
+        insertSampleWords();
         initButtonsWithCounts();
         // 注册广播接收器
         countUpdateReceiver = new BroadcastReceiver() {

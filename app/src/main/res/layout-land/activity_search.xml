@@ -1,47 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="16dp"
+    android:id="@+id/search_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false">
 
-    <!-- 返回按钮 -->
+    <!-- —— 1. 背景 ImageView：铺满全屏（包括状态栏） —— -->
+    <ImageView
+        android:id="@+id/bg_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.3"
+        android:src="@drawable/bg1" />
+
+    <!-- —— 2. 半透明遮罩 View：加深背景、提高上层控件可读性 —— -->
+    <View
+        android:id="@+id/mask_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000" />
+
+    <!-- —— 3. 返回按钮 —— -->
     <ImageButton
         android:id="@+id/btn_back_search"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="@dimen/status_bar_and_margin"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_revert"
         android:contentDescription="返回"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"/>
+        android:layout_alignParentStart="true" />
 
-    <!-- 搜索框 -->
+    <!-- —— 4. 搜索框 —— -->
     <EditText
         android:id="@+id/et_keyword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入单词"
         android:layout_toEndOf="@id/btn_back_search"
         android:layout_alignTop="@id/btn_back_search"
-        android:layout_marginStart="8dp"/>
+        android:layout_marginStart="8dp"
+        android:hint="输入单词" />
 
-    <!-- 前往搜索 -->
+    <!-- —— 5. 前往搜索按钮 —— -->
     <ImageButton
         android:id="@+id/btn_search_go"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@android:drawable/ic_menu_search"
-        android:background="@android:color/transparent"
-        android:contentDescription="搜索"
         android:layout_alignTop="@id/et_keyword"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_search"
+        android:contentDescription="搜索" />
 
-    <!-- 列表结果 -->
+    <!-- —— 6. 搜索结果列表 —— -->
     <ListView
         android:id="@+id/lv_search_results"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/et_keyword"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp" />
+
 </RelativeLayout>
